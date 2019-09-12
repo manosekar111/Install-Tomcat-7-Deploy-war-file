@@ -1,0 +1,68 @@
+
+===================================================================================
+Tomcat installation on EC2 instance - Redhat/Centos
+===================================================================================
+
+  hostnamectl set-hostname tomcat.etechbrain.com
+  bash
+  hostname
+
+  yum -y update
+
+  yum install java-1.8.0-openjdk-headless.x86_64
+  yum install java-1.8.0-openjdk-devel.x86_64 -y
+ 
+  cd /opt/
+  yum -y install wget vim firewalld
+
+  # https://tomcat.apache.org/
+
+  wget http://apachemirror.wuchna.com/tomcat/tomcat-9/v9.0.24/bin/apache-tomcat-9.0.24.tar.gz
+  tar xvzf apache-tomcat-9.0.24.tar.gz
+  rm -rvf apache-tomcat-9.0.24.tar.gz
+  chmod +x /opt/apache-tomcat-9.0.24/bin/startup.sh
+  chmod +x /opt/apache-tomcat-9.0.24/bin/shutdown.sh
+
+   ln -s /opt/apache-tomcat-9.0.24/bin/startup.sh /usr/local/bin/tomcatup
+   ln -s /opt/apache-tomcat-9.0.24/bin/shutdown.sh /usr/local/bin/tomcatdown
+
+   /usr/local/bin/tomcatup
+
+   http://13.233.2.135:8080
+
+   /usr/local/bin/tomcatdown
+
+  # Change the tomcat port no 8080 to 8090
+
+   vim /opt/apache-tomcat-9.0.24/conf/server.xml
+   /usr/local/bin/tomcatup
+   
+   http://13.233.2.135:8090/
+
+  find / -name context.xml
+
+  # Value ClassName field on files which are under webapp directory
+
+  /usr/local/bin/tomcatdown
+
+  vim /opt/apache-tomcat-9.0.24/webapps/host-manager/META-INF/context.xml
+    <!-- <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+  vim /opt/apache-tomcat-9.0.24/webapps/manager/META-INF/context.xml
+    <!--  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" /> -->
+
+  /usr/local/bin/tomcatup
+
+  /opt/apache-tomcat-9.0.24/conf/tomcat-user.xml
+  	<role rolename="manager-gui"/>
+	<role rolename="manager-script"/>
+	<role rolename="manager-jmx"/>
+	<role rolename="manager-status"/>
+	<user username="admin" password="admin" roles="manager-gui, manager-script, manager-jmx, manager-status"/>
+	<user username="deployer" password="deployer" roles="manager-script"/>
+	<user username="tomcat" password="s3cret" roles="manager-gui"/>
+  http://13.233.2.135:8090/
+
+===================================================================================
